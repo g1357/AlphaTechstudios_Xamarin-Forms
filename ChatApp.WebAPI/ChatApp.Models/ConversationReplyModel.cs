@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
+/// <summary>
+/// Модели данных приложения
+/// </summary>
 namespace ChatApp.Models
 {
 	/// <summary>
@@ -9,7 +12,6 @@ namespace ChatApp.Models
 	/// </summary>
 	public class ConversationReplyModel : BaseModel
 	{
-
 		/// <summary>
 		/// Идентификатор пользователя отправителя
 		/// </summary>
