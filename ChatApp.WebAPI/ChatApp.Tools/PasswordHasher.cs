@@ -14,7 +14,7 @@ namespace ChatApp.Tools
         // 24 = 192 bits
         private const int SaltByteSize = 24; // Размер модификатора пароля
         private const int HashByteSize = 24; // Размер хэша
-        private const int HasingIterationsCount = 10101; // Счётчик итераций хэширования
+        private const int HashingIterationsCount = 10101; // Счётчик итераций хэширования
 
         /// <summary>
         /// Вычислить хэш
@@ -24,7 +24,7 @@ namespace ChatApp.Tools
         /// <param name="iterations">Колическтво итераций</param>
         /// <param name="hashByteSize">размер хзша</param>
         /// <returns></returns>
-        public static byte[] ComputeHash(string password, byte[] salt, int iterations = HasingIterationsCount, int hashByteSize = HashByteSize)
+        public static byte[] ComputeHash(string password, byte[] salt, int iterations = HashingIterationsCount, int hashByteSize = HashByteSize)
         {
             Rfc2898DeriveBytes hashGenerator = new Rfc2898DeriveBytes(password, salt);
             hashGenerator.IterationCount = iterations;
