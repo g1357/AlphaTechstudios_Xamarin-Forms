@@ -4,26 +4,30 @@ using System.Text;
 
 namespace ChatApp.Models
 {
-    public class ConversationReplyModel: BaseModel
-    {
+	/// <summary>
+	/// Модель данных ответа в диалоге
+	/// </summary>
+	public class ConversationReplyModel : BaseModel
+	{
 
 		/// <summary>
-		/// The sender user id.
+		/// Идентификатор пользователя отправителя
 		/// </summary>
 		public long SenderUserId { get; set; }
 
 		/// <summary>
-		/// The conversation reply content
+		/// Содержание ответа в диалогер
 		/// </summary>
 		public string Content { get; set; }
 
-        public long ConversationID { get; set; }
-        /// <summary>
-        /// The  association of the conversation   
-        /// </summary>
-        //[ForeignKey("ConversationId")]
-        public ConversationModel Conversation { get; set; }
+		public long ConversationID { get; set; }
 
-		
+		/// <summary>
+		/// Данные о диалоге 
+		/// </summary>
+		//[ForeignKey("ConversationId")]
+		public ConversationModel Conversation { get; set; }
+
+
 	}
 }

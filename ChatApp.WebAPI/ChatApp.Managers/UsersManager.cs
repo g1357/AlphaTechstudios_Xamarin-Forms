@@ -15,16 +15,36 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 
+/// <summary>
+/// Менеджеры приложения
+/// </summary>
 namespace ChatApp.Managers
 {
+    /// <summary>
+    /// Менеджер пользователей
+    /// </summary>
     public class UsersManager : BaseManager, IUsersManager
     {
+        // Хранилище данных о пользователях
         private readonly IUsersRepository usersRepository;
+        // Хранилище данных о жетонов обновления
         private ITokensManager tokensManager;
+        // Хранилище данных о друзьях
         private readonly IFriendsRepository friendsRepository;
+        // Хранилище данных о подключениях
         private readonly IConnectionsRepository connectionsRepository;
+        // Настройки приложения
         private readonly AppSettings appSettings;
 
+        /// <summary>
+        /// Конструктор менеджера пользоватеелй.
+        /// </summary>
+        /// <param name="unitOfWork">Обработчик Единицы работы</param>
+        /// <param name="usersRepository">Хранилище пользователей</param>
+        /// <param name="tokensManager">Хранилище токенов обновления</param>
+        /// <param name="friendsRepository">Хранилище друзей</param>
+        /// <param name="connectionsRepository">Хранилище подключений</param>
+        /// <param name="appSettings">Настройки приложения</param>
         public UsersManager(IUnitOfWork unitOfWork,
             IUsersRepository usersRepository,
             ITokensManager tokensManager,
@@ -40,17 +60,25 @@ namespace ChatApp.Managers
             this.appSettings = appSettings.Value;
         }
 
+        /// <summary>
+        /// Добавить пользователя.
+        /// </summary>
+        /// <param name="userModel">Данные о пользователе</param>
+        /// <returns>Идентификатор пользователя или -100, если пользователь уже существует</returns>
         public long InsertUser(UserModel userModel)
         {
+            // Преобразуем адрес электронной почты к строчным буквам
             userModel.Email = userModel.Email.ToLower();
+            // Получаем данные о пользователе по адресу электронной почты
             var user = GetUserByEmail(userModel.Email);
-            if (user != null)
+            if (user != null) // Если пользователь найден
             {
-                return -100;
+                return -100;    // Возвращаем код -100
             }
 
-            var now = DateTime.Now;
-            var salt = PasswordHasher.GenerateSalt();
+            var now = DateTime.Now; // Берём текущуие дату и время
+            var salt = PasswordHasher.GenerateSalt();   // Генерируем модификатор пароля
+            // Вычисляем хэш-код пароля
             var pwdHash = Convert.ToBase64String(PasswordHasher.ComputeHash(userModel.Password, salt));
 
             userModel.CreationDate = now;

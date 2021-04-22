@@ -4,25 +4,24 @@ using System.Text;
 
 namespace ChatApp.Models
 {
-    public class ConversationModel: BaseModel
+    /// <summary>
+    /// Модель данных диалога
+    /// </summary>
+    public class ConversationModel : BaseModel
     {
         /// <summary>
-        /// The conversation replies.
+        /// Ответы в диалога.
         /// </summary>
         public ICollection<ConversationReplyModel> ConversationsReplies { get; set; }
 
         /// <summary>
-        /// The first user id.
+        /// Идентификатор первого пользователя.
         /// </summary>
         public long UserOneID { get; set; }
 
-
         /// <summary>
-        /// The second user id.
+        /// Идентификатор второго пользователя.
         /// </summary>
         public long UserTwoID { get; set; }
-
-      
-
     }
 }
