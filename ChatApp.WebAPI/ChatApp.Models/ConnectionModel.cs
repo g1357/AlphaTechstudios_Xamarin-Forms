@@ -1,4 +1,7 @@
-﻿namespace ChatApp.Models
+﻿/// <summary>
+/// Модели данных приложения
+/// </summary>
+namespace ChatApp.Models
 {
     /// <summary>
     /// Модель данных подключения

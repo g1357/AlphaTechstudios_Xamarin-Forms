@@ -76,10 +76,10 @@ namespace ChatApp.Managers
         /// <param name="refreshToekn">Жетон обновления</param>
         /// <param name="userAgent">Тип агента пользователя</param>
         /// <returns>Обновлённые данные о жетоне обновления</returns>
-        public RefreshTokenModel UpdateToken(string refreshToekn, string userAgent)
+        public RefreshTokenModel UpdateToken(string refreshToken, string userAgent)
         {
             // Получаем данные о жетоне обновления по жетону обновления и типу агента пользователя
-            var tokenModel = GetRefreshToken(refreshToekn, userAgent);
+            var tokenModel = GetRefreshToken(refreshToken, userAgent);
             if (tokenModel == null) // Tсли жетон отсутствует
             {
                 return null;    // Возвращаем null

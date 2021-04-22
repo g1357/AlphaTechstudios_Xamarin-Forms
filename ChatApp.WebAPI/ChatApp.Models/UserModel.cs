@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
+/// <summary>
+/// Модели данных приложения
+/// </summary>
 namespace ChatApp.Models
 {
     /// <summary>
