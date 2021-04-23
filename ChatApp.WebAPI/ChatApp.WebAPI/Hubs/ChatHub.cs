@@ -6,24 +6,47 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+/// <summary>
+/// Концентраторы Web API приложения
+/// </summary>
 namespace ChatApp.WebAPI.Hubs
 {
+    /// <summary>
+    /// Концентратор бесед
+    /// </summary>
     public class ChatHub : Hub
     {
         private readonly IUsersManager usersManager;
         private readonly IConversationsManager conversationsManager;
 
+        /// <summary>
+        /// Конструктор концентратора бесед
+        /// </summary>
+        /// <param name="usersManager"></param>
+        /// <param name="conversationsManager"></param>
         public ChatHub(IUsersManager usersManager, IConversationsManager conversationsManager)
         {
             this.usersManager = usersManager;
             this.conversationsManager = conversationsManager;
         }
 
+        /// <summary>
+        /// Отправить сообщение.
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
         public async Task SendMessage(string userId, string message)
         {
             await Clients.Others.SendAsync("ReceiveMessage", userId, message);
         }
 
+        /// <summary>
+        /// Отправить личное сообщение
+        /// </summary>
+        /// <param name="userEmail"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
         public async Task SendPrivateMessage(string userEmail, string message)
         {
 
@@ -48,6 +71,11 @@ namespace ChatApp.WebAPI.Hubs
             }
         }
 
+        /// <summary>
+        /// Вызывается при установке соединения.
+        /// </summary>
+        /// <param name="userEmail"></param>
+        /// <returns></returns>
         public async Task OnConnect(string userEmail)
         {
             var user = usersManager.GetUserByEmail(userEmail);
@@ -62,6 +90,11 @@ namespace ChatApp.WebAPI.Hubs
             await base.OnConnectedAsync();
         }
 
+        /// <summary>
+        /// Вызывается при прекращении соединения.
+        /// </summary>
+        /// <param name="userEmail"></param>
+        /// <returns></returns>
         public async Task OnDisconnect(string userEmail)
         {
             var user = usersManager.GetUserByEmail(userEmail);
