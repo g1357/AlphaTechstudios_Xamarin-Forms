@@ -10,12 +10,21 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+/// <summary>
+/// Ядро сервисов мобильного приложения
+/// </summary>
 namespace ChatApp.Mobile.Services.Core
 {
+    /// <summary>
+    /// Базовый сервис для остальных сервисов
+    /// </summary>
     public class BaseService
     {
+        // Создаём простой системный семафор, позволяющий доступ только из одного потока
         private static SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1, 1);
+        // Сервис сессий
         protected readonly ISessionService SessionService;
+        // Сервис навигации
         private readonly INavigationService navigationService;
 
         /// <summary>
@@ -29,24 +38,35 @@ namespace ChatApp.Mobile.Services.Core
         protected string BaseRoute { get; set; }
 
         /// <summary>
+        /// Вернуть базовый URL
         /// Gets the base address.
         /// </summary>
-        protected string BaseUrl
-        {
-            get => $"{BaseAddress}{BaseRoute}/";
-        }
+        protected string BaseUrl => $"{BaseAddress}{BaseRoute}/";
 
-
+        /// <summary>
+        /// Конструктор базового сервиса с одним параметром.
+        /// </summary>
+        /// <param name="sessionService">Сервис сессий</param>
         public BaseService(ISessionService sessionService)
         {
+            // Инициируем пути
             InitRoutes();
+            // Сохраняем сервис сессий для дальнейшего использования
             SessionService = sessionService;
         }
 
+        /// <summary>
+        /// Конструтор базового сервиса с двумя параметрами
+        /// </summary>
+        /// <param name="sessionService">Сервис сессий</param>
+        /// <param name="navigationService">Сервис навигации</param>
         public BaseService(ISessionService sessionService, INavigationService navigationService)
         {
+            // Инициируем пути
             InitRoutes();
+            // Сохраняем сервис сессий для дальнейшего использования
             SessionService = sessionService;
+            // Сохраняем сервис навигации для дальнейшего использования
             this.navigationService = navigationService;
         }
 
@@ -60,18 +80,28 @@ namespace ChatApp.Mobile.Services.Core
             return await GetClient(BaseUrl, withoutToken);
         }
 
+        /// <summary>
+        /// Инициировать пути
+        /// </summary>
         private void InitRoutes()
         {
+            // Задаём базовый путь
             BaseRoute = "/api";
-            BaseAddress = "http://192.168.1.36:45459";
+            // Задаём базовый адрес
+            //BaseAddress = "http://192.168.1.36:45459";
+            // Для эмклятора Android задаём IP адрес
+            BaseAddress = "http://10.0.2.2:45459";
         }
 
+        /// <summary>
+        /// Получить обновлённого клиента HTTP
+        /// </summary>
+        /// <returns></returns>
         private HttpClient GetClientRefresh()
         {
             HttpClient client = new HttpClient();
             client.BaseAddress = new Uri(BaseUrl);
             return client;
-
         }
 
         /// <summary>
@@ -81,62 +111,92 @@ namespace ChatApp.Mobile.Services.Core
         /// <returns>The httpClient.</returns>
         protected async Task<HttpClient> GetClient(string baseUrl, bool withoutToken = false)
         {
-            bool relase = false;
+            // Флаг "Освобождать семафор при ошибке".
+            // Начальное значение "не освобождать" так как семафор не используется
+            bool release = false;
+            // Создаём слиента HTTP
             HttpClient client = new HttpClient();
+            // Задаём клиенту базовый адрес
             client.BaseAddress = new Uri(baseUrl);
 
-            if (withoutToken)
+            if (withoutToken) // Если запрос должен передаваться без жетона, то
             {
+                // Возвращаем созданного клиента
                 return client;
             }
+            // Получаем данные о пользователе из защищённого хранилища приложения
             var user = await SessionService.GetConnectedUser();
+            // Получаем данные о жетоне из защищённого хранилища приложения
             var token = await SessionService.GetToken();
 
             try
             {
-                if (user != null)
+                if (user != null) // Если пользователь подключён, то
                 {
+                    // Если срок действия жетона +30 секунд мнгьше текущих даты и времени, то
                     if (token.TokenExpireTime.AddSeconds(30) <= DateTime.UtcNow)
-                    {
+                    {   // Нужно получить новый жетон
+
+                        // Ждём освобождения семафора и занимаем его
                         await semaphoreSlim.WaitAsync();
-                        relase = true;
+                        // Симафор используется, при ошибке его надо освободить, чтобы избежать клинча
+                        release = true;
+                        // Получаем данные о пользователе из защищённого хранилища приложения
                         user = await SessionService.GetConnectedUser();
+                        // Получаем данные о жетоне из защищённого хранилища приложения
                         token = await SessionService.GetToken();
 
+                        // Если срок действия жетона +30 секунд мнгьше текущих даты и времени, то
                         if (token.TokenExpireTime.AddSeconds(30) <= DateTime.UtcNow)
                         {
+                            // Посылаем запрос вёб сервису на обновление жетона доступа 
+                            //и получаем данные о пользователе с очищенным паролем или null, при ошибке
                             user = await PostRefresh<UserModel, string>("Users/refresh", token.RefreshToken);
-                            if (user != null)
+                            if (user != null) // Если получение данных прощло успешно, то
                             {
+                                // Сохраняем в защищённом хранилище приложения данные о пользователе
                                 await SessionService.SetConnectedUser(user);
+                                // Сохраняем в защищённом хранилище приложения данные о жетоне
                                 await SessionService.SetToken(new TokenModel
                                 {
                                     Token = user.Token,
                                     RefreshToken = user.RefreshToken,
                                     TokenExpireTime = user.TokenExpireTimes
                                 });
+                                // Получаем данные о жетоне из защищённого хранилища приложения
                                 token = await SessionService.GetToken();
                             }
                             else
                             {
+                                // Очищаем данные о подключёном пользователе в защищённом хранилище
                                 await SessionService.SetConnectedUser(null);
+                                // Очищаем данные о жетоне в защищённом хранилище
                                 await SessionService.SetToken(null);
+                                // Переходим на страницу ввхлда в систему
                                 await navigationService.NavigateAsync("../LoginPage");
                             }
                         }
+                        // Освоюождаем семафор
                         semaphoreSlim.Release();
-                        relase = false;
+                        // Семафор освобождён и меняем значение флага
+                        release = false;
                     }
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.Token);
+                    // Устанавливаем жетон в заголовке запроса HTTP
+                    client.DefaultRequestHeaders.Authorization = 
+                        new AuthenticationHeaderValue("Bearer", token.Token);
                 }
             }
             catch (Exception exp)
             {
-                if (relase)
+                // Если семафор нужно освободить, то
+                if (release)
                 {
+                    // Освобождаем семафор
                     semaphoreSlim.Release();
                 }
             }
+            // Возвращаем клиента для работы с вёб сервисом
+            // В зависимости от входного параметра с жетоном или без
             return client;
         }
 
@@ -258,29 +318,48 @@ namespace ChatApp.Mobile.Services.Core
                 }
             }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="M"></typeparam>
+        /// <param name="url"></param>
+        /// <param name="model"></param>
+        /// <returns></returns>
         protected async Task<T> PostRefresh<T, M>(string url, M model)
         {
+            // Сериализуем данные в JSON
             var content = JsonConvert.SerializeObject(model);
+            // Создаём контент HTTP
             HttpContent contentPost = new StringContent(content, Encoding.UTF8, "application/json");
+            // Создаём клиента HTTP
             using (HttpClient client = this.GetClientRefresh())
             {
                 try
                 {
+                    // Отправка запроса POST по заданному URL и с указанным содержимым
                     var response = await client.PostAsync(url, contentPost);
 
+                    // Если код состояния ответа не успешный, то
                     if (!response.IsSuccessStatusCode)
                     {
+                        // Получаем в строковом формате содержимое тела ответа
                         var result = await response.Content.ReadAsStringAsync();
+                        // Возвращаем значение по умолчанию типа результата
                         return default(T);
                     }
                     else
                     {
+                        // Получаем в строковом формате содержимое тела ответа
                         var result = await response.Content.ReadAsStringAsync();
+                        // Возвращаем десериализованный из JSON тело ответа на запрос
                         return JsonConvert.DeserializeObject<T>(result);
                     }
                 }
                 catch (Exception exp)
                 {
+                    // Возвращаем значение по умолчанию типа результата
                     return default(T);
                 }
             }
