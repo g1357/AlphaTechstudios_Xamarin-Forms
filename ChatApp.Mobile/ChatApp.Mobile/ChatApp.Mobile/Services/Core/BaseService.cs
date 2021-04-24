@@ -90,7 +90,7 @@ namespace ChatApp.Mobile.Services.Core
             // Задаём базовый адрес
             //BaseAddress = "http://192.168.1.36:45459";
             // Для эмклятора Android задаём IP адрес
-            BaseAddress = "http://10.0.2.2:45459";
+            BaseAddress = "http://10.0.2.2:5000"; //45459";
         }
 
         /// <summary>

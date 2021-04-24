@@ -189,7 +189,7 @@ namespace ChatApp.Managers
             // Выбираем из хранилища данных о пользователепо адресу электронной почты
             // и пустому жетону проверки
             var user = usersRepository.Get(x => 
-                x.Email == loginModel.Email && string.IsNullOrEmpty(x.ValidationToken))
+                x.Email == loginModel.Email && !string.IsNullOrEmpty(x.ValidationToken))
                 .SingleOrDefault();
 
             if (user != null)   // Если пользователь найден

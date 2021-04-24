@@ -77,7 +77,7 @@ namespace ChatApp.WebAPI.Controllers
                 var userModel = usersManager.Login(loginModel, HttpContext);
 
                 // Если данные пользователя не получениы или жетон доступа не пустой, то
-                if (userModel == null || !string.IsNullOrEmpty(userModel.ValidationToken))
+                if (userModel == null || string.IsNullOrEmpty(userModel.ValidationToken))
                 {
                     // Возвращаем "Плохой запрос"
                     // с сообщением "Имя пользователя и пароль неправильные"
