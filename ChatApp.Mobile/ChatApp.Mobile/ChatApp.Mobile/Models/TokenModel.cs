@@ -2,20 +2,23 @@
 
 namespace ChatApp.Mobile.Models
 {
+    /// <summary>
+    /// Модель данных о жетоне.
+    /// </summary>
     public class TokenModel
     {
         /// <summary>
-        /// Gets or sets the authentication token.
+        /// Жетон доступа.
         /// </summary>
         public string Token { get; set; }
 
         /// <summary>
-        /// Gets or sets the RefreshToken.
+        /// Жетон обновления жетона досмтупа.
         /// </summary>
         public string RefreshToken { get; set; }
 
         /// <summary>
-        /// Gets or sets the Token ExpireTime
+        /// Дата и время окончания срока действия жетона доступа.
         /// </summary>
         public DateTime TokenExpireTime { get; set; }
     }

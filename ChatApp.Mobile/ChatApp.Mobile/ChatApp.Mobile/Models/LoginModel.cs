@@ -4,15 +4,18 @@ using System.Text;
 
 namespace ChatApp.Mobile.Models
 {
+    /// <summary>
+    ///  Модель данных входа в систему.
+    /// </summary>
     public class LoginModel
     {
         /// <summary>
-        /// Gets or sets the Email.
+        /// Электронная почта пользователя.
         /// </summary>
         public string Email { get; set; }
 
         /// <summary>
-        /// Gets or sets the password.
+        /// Пароль пользователя.
         /// </summary>
         public string Password { get; set; }
     }

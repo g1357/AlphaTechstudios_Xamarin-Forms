@@ -19,8 +19,8 @@ namespace ChatApp.Mobile.Services.Core
         /// <summary>
         /// Конструктор сервиса аутентификации
         /// </summary>
-        /// <param name="sessionService"></param>
-        /// <param name="navigationService"></param>
+        /// <param name="sessionService">Сервис сессий</param>
+        /// <param name="navigationService">Сервис навигации</param>
         public AuthenticationService(ISessionService sessionService,
             INavigationService navigationService)
             // Вызываем конструктор базовогокласса и передаём ему параметру
@@ -29,10 +29,11 @@ namespace ChatApp.Mobile.Services.Core
         }
 
         /// <summary>
-        /// Makes login for user.
+        /// Войти в систему
         /// </summary>
-        /// <param name="loginDto">The login dto.</param>
-        /// <returns>The authenticated user.Null if not.</returns>
+        /// <param name="loginDto">Данные для входа в систему</param>
+        /// <returns>Данные о пользователе с очищенным паролем, при успешнов входе в систему.
+        /// null в противном случае</returns>
         public async Task<UserModel> Login(LoginModel loginDto)
         {
             // Возвращаем результат выполнения асинхронного запроса к вёб сервису командой POST
@@ -41,14 +42,20 @@ namespace ChatApp.Mobile.Services.Core
         }
 
         /// <summary>
-        /// Logout user.
+        /// Выйти из системы.
         /// </summary>
-        /// <returns>This methode returns nothing.</returns>
+        /// <returns>Этот метод ничего не возвращает.</returns>
         public async Task LogOut()
         {
             await SessionService.LogOut();
         }
 
+        /// <summary>
+        /// Обновить жетон доступа.
+        /// </summary>
+        /// <param name="token">Данные о жетоне</param>
+        /// <returns>Данные о пользователес очищенным паролем, при успешной операции.
+        /// null ghb ytelfxt/</returns>
         public async Task<UserModel> RefreshToken(string token)
         {
             return await PostRefresh<UserModel, string>("Users/refresh", token);
