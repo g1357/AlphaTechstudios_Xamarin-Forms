@@ -24,7 +24,7 @@ using System.Text;
 namespace ChatApp.WebAPI
 {
     /// <summary>
-    /// 
+    /// Стартовый класс сервиса
     /// </summary>
     public class Startup
     {
@@ -41,10 +41,10 @@ namespace ChatApp.WebAPI
         // Конфигурация
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime.
-        // Use this method to add services to the container.
         /// <summary>
         /// Конфигурировать сервисы.
+        /// Этот метод вызывается во время выполнения и
+        /// используется, чтобы добавить сервисы в контейнер.
         /// </summary>
         /// <param name="services">Коллекция сервисов</param>
         public void ConfigureServices(IServiceCollection services)
@@ -125,17 +125,20 @@ namespace ChatApp.WebAPI
             });
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        // This method gets called by the runtime.
+        // Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
+            if (env.IsDevelopment()) // Если текущая среда является средой разработким, то
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ChatApp.WebAPI v1"));
+                app.UseSwaggerUI(c => 
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "ChatApp.WebAPI v1"));
             }
 
-           //app.UseHttpsRedirection();
+            // Переназначает все запросы на протокол HTTPS
+            //app.UseHttpsRedirection();
 
             app.UseRouting();
 
